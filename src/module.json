@@ -1,0 +1,12 @@
+{
+  "name": "clocks",
+  "title": "clocks",
+  "description": "Forged in the Dark progress clocks",
+  "version": "0.1.0",
+  "author": "strass",
+  "scripts": ["vendor.js"],
+  "esmodules": ["clocks.js"],
+  "styles": ["clocks.css"],
+  "minimumCoreVersion": "0.5.5",
+  "compatibleCoreVersion": "0.5.5"
+}

@@ -1,0 +1,25 @@
+.progress-clocks.clock {
+  box-shadow: none;
+  background: none;
+  min-width: fit-content;
+  min-height: max-content;
+  header {
+    // display: none;
+    border-bottom: none;
+  }
+  section {
+    background: none;
+    pointer-events: none;
+    flex: 1 0 auto;
+    nav {
+      pointer-events: all;
+    }
+  }
+  svg {
+    max-width: 100%;
+    pointer-events: initial;
+    --fill: tomato;
+    --background: white;
+    --stroke: black;
+  }
+}
