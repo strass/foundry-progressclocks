@@ -1,5 +1,6 @@
 import { MODULE_NAME, CLOCKS_SETTINGS_KEYS } from "./settings";
 import type * as Lodash from "lodash";
+import { getSegmentPaths, generateClockTemplatePayload } from "./util/clocks";
 const _: Lodash.LoDashStatic = require("lodash");
 
 const popper = require("@popperjs/core");
@@ -9,12 +10,15 @@ export type ClockOptions = ApplicationOptions & {
   ticks: number;
 };
 
+const clockTemplate = `modules/${MODULE_NAME}/templates/clock.html`;
+
 export default class Clock extends Application {
   options: ClockOptions;
   _id: number;
 
   constructor(options: ClockOptions) {
-    super(options);
+    super({ ...options, template: clockTemplate });
+    options.template = clockTemplate;
     console.log(`Clock constructor: `, options);
     if (options.segments <= 1) {
       throw new Error("Clocks need at least 2 segments");
@@ -39,7 +43,7 @@ export default class Clock extends Application {
       popOut: false,
       resizable: false,
       width: 64,
-      template: "modules/clocks/templates/clock.html",
+      template: clockTemplate,
       classes: ["progress-clocks", "clock"],
     });
     return obj;
@@ -103,34 +107,17 @@ export default class Clock extends Application {
 
   /** @override */
   getData() {
-    console.log(3);
-    const segments = this.options.segments;
-    const segmentSizes = 360 / segments;
-    const ticks = this.options.ticks;
-    const size = this.position.width;
-    const radius = size / 2;
-    const pathTransforms = Array(segments)
-      .fill(undefined)
-      .map((_, idx) => {
-        const position =
-          idx * segmentSizes - (segments % 2 !== 0 ? 0.5 * segmentSizes : 0);
-        const rad = position * (Math.PI / 180);
-        const arr = [
-          Math.cos(rad) * radius + size / 2,
-          Math.sin(rad) * radius + size / 2,
-        ];
-        return arr;
-      });
-    const data = {
-      segments,
-      ticks,
-      percent: (ticks / segments) * 100,
-      pathTransforms,
-      size,
-      ...super.getData(),
+    const data = super.getData();
+    return {
+      ...data,
+      ...generateClockTemplatePayload({
+        segments: this.options.segments,
+        ticks: this.options.ticks,
+        size: this.position.width,
+        title: this.options.title,
+        id: this._id,
+      }),
     };
-    console.log("getData:", data);
-    return data;
   }
 
   /** @override */
@@ -148,13 +135,11 @@ export default class Clock extends Application {
     $(nav)
       .find(".plus")
       .click(() => {
-        console.log("+");
         this._setClock({ segments: ++this.options.segments });
       });
     $(nav)
       .find(".minus")
       .click(() => {
-        console.log("-");
         this._setClock({ segments: --this.options.segments });
       });
     // clock segments
@@ -191,7 +176,6 @@ export default class Clock extends Application {
     const virtualElement = {
       getBoundingClientRect: () => {
         const bb = svg.getBoundingClientRect();
-        console.log(bb);
         const newObj = {
           height: 0,
           width: 0,
@@ -200,7 +184,6 @@ export default class Clock extends Application {
           top: bb.top + (1 / 2) * bb.height - (1 / 2) * navBB.height,
           bottom: bb.top + (1 / 2) * bb.height - (1 / 2) * navBB.height,
         };
-        console.log(newObj);
         return newObj;
       },
     };

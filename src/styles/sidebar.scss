@@ -1,0 +1,36 @@
+// SIDEBAR:
+#sidebar {
+  // TODO: why doesn't this work? `width: Number(Sidebar.defaultOptions.width) + 30,`
+  width: 330px;
+  #progressclocks.tab {
+    --fill: tomato;
+    --stroke: black;
+    --background: white;
+    flex-direction: column;
+    ol#clock-log {
+      list-style: none;
+      li.clock {
+        display: flex;
+        flex-direction: column;
+        header {
+          display: flex;
+          justify-content: space-between;
+          h2 {
+            flex: 1 0 auto;
+          }
+          button {
+            flex: 0 1 auto;
+            width: min-content;
+          }
+        }
+        svg {
+          margin-bottom: 16px;
+        }
+        nav#context-menu {
+          position: static;
+          margin-bottom: 24px;
+        }
+      }
+    }
+  }
+}

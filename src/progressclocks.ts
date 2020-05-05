@@ -18,6 +18,7 @@ import {
 } from "./module/settings.js";
 import { preloadTemplates } from "./module/preloadTemplates.js";
 import Clock, { ClockOptions } from "./module/Clock";
+import ClockSidebarTab from "./module/ClockTab.js";
 
 // declare global {
 //   interface Window {
@@ -29,10 +30,10 @@ import Clock, { ClockOptions } from "./module/Clock";
 /* Initialize module					*/
 /* ------------------------------------ */
 Hooks.once("init", async function () {
-  console.log("clocks | Initializing clocks");
+  console.log(`${MODULE_NAME} | Initializing clocks`);
 
   // Assign custom classes and constants here
-  console.log("clocks | Registering Handlebars helper: ternary");
+  console.log(`${MODULE_NAME} | Registering Handlebars helper: ternary`);
   Handlebars.registerHelper("ternary", require("handlebars-helper-ternary"));
   // Register custom module settings
   registerSettings();
@@ -41,6 +42,29 @@ Hooks.once("init", async function () {
   await preloadTemplates();
 
   // Register custom sheets (if any)
+
+  // TODO: is this the right place to put these?
+  ui.clocksSidebarTab = new ClockSidebarTab({});
+
+  const _origSidebarRender =
+    //@ts-ignore
+    Sidebar.prototype._render;
+
+  // @ts-ignore
+  Sidebar.prototype._render = async function (...args) {
+    await _origSidebarRender.call(this, ...args);
+    await ui.clocksSidebarTab._render(true, {});
+  };
+
+  const _origDefaultOptions = Sidebar.defaultOptions;
+
+  // @ts-ignore
+  Sidebar.__defineGetter__("defaultOptions", function () {
+    return mergeObject(_origDefaultOptions, {
+      template: `modules/${MODULE_NAME}/templates/sidebar-with-clocks.html`,
+      width: Number(_origDefaultOptions.width) + 30,
+    });
+  });
 });
 /* ------------------------------------ */
 /* Setup module							*/
@@ -56,6 +80,42 @@ Hooks.once("ready", function () {
   renderClocks();
 });
 
+/**
+ * Add Status right click option for combat tracker combatants
+ */
+Hooks.on(
+  "getSceneControlButtons",
+  (
+    controls: (SceneControls["controls"][0] & {
+      name: string;
+      tools: {
+        button?: boolean;
+        icon: string;
+        name: string;
+        title: string;
+        onClick: Function;
+      }[];
+      title: string;
+      layer: string;
+      visible: boolean;
+      icon: string;
+      activeTool: string;
+      // onClick: Function;
+    })[]
+  ) => {
+    let group = controls.find((b) => b.name == "notes");
+    group.tools.push({
+      button: true,
+      icon: "fas fa-circle",
+      name: "test",
+      title: "CONTROLS.createClock",
+      onClick: () => {
+        Clock.createClock();
+      },
+    });
+  }
+);
+
 // @ts-ignore
 window.createClock = Clock.createClock;
 
@@ -66,7 +126,6 @@ window.resetClocks = Clock.resetClocks;
 window.getClocks = Clock.getClocks;
 
 function renderClocks() {
-  if (!game.clocks) game.clocks = {};
   const clocks: ClockOptions[] = game.settings.get(
     MODULE_NAME,
     CLOCKS_SETTINGS_KEYS.clocks
@@ -86,7 +145,6 @@ function renderClocks() {
       resizable: true,
       ...clock,
     });
-    game.clocks[c.getId()] = c;
     c.render(true, {});
   });
 }

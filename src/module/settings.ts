@@ -1,14 +1,13 @@
 import Clock, { ClockOptions } from "./Clock";
-
-declare global {
-  interface Game {
-    clocks?: Record<number, Clock>;
-  }
-}
+import { registerClockPartial } from "./Handlebars/partials";
 
 export const MODULE_NAME = "progressclocks";
 export const enum CLOCKS_SETTINGS_KEYS {
   clocks = `clocks_v4`,
+  localSettings = "localsettings_v1",
+}
+export const enum CLOCKS_HOOKS {
+  clockSettingsUpdate = "clockSettingsUpdate",
 }
 
 export const registerSettings = function () {
@@ -20,23 +19,16 @@ export const registerSettings = function () {
     config: false,
     default: [],
     type: Object,
-    onChange: (newClocks: ClockOptions[]) => {
-      console.debug("clocks changed", newClocks);
-      newClocks.forEach(({ _id, ticks, segments }) => {
-        const clock = game.clocks[_id];
-        if (!clock) {
-          console.error(`No clock with id "${_id}" found`);
-        } else if (
-          clock &&
-          (clock.ticks !== ticks || clock.segments !== segments)
-        ) {
-          clock.ticks = ticks;
-          clock.segments = segments;
-          clock.render(true, {});
-        } else {
-          console.debug(`Clock found but update unnecessary`);
-        }
-      });
-    },
+    onChange: (newClocks: ClockOptions[]) =>
+      Hooks.call(CLOCKS_HOOKS.clockSettingsUpdate),
   });
+  game.settings.register(MODULE_NAME, CLOCKS_SETTINGS_KEYS.localSettings, {
+    name: "Clocks Local Settings",
+    scope: "user",
+    config: false,
+    default: {},
+    type: Object,
+    // onChange: () => {},
+  });
+  registerClockPartial();
 };

@@ -11,8 +11,9 @@
     background: none;
     pointer-events: none;
     flex: 1 0 auto;
-    nav {
+    nav#context-menu {
       pointer-events: all;
+      position: static;
     }
   }
   svg {

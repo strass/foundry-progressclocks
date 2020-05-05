@@ -1,0 +1,17 @@
+{{log clocks}}
+<section class="sidebar-tab tab" id="progressclocks" data-tab="progressclocks">
+    <h1>Clocks</h1>
+    <ol id="clock-log">
+        {{#each clocks}}
+        {{#with @this}}
+        <li class="clock" data-id="{{ get @this id }}" data-segments="{{ get @this segments }}"
+            data-ticks="{{ ticks }}">
+            <header>
+                <h2>{{title}}</h2><button role="edit"><i class="fas fa-edit"></i></button>
+            </header>
+            {{> clock segments=segments  ticks=ticks  size=size  pathTransforms=pathTransforms }}
+        </li>
+        {{/with}}
+        {{/each}}
+    </ol>
+</section>

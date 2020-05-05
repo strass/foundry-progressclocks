@@ -1,4 +1,7 @@
-<svg height="100%" width="100%" viewBox="0 0 {{size}} {{size}}">
+export const registerClockPartial = () =>
+  Handlebars.registerPartial(
+    "clock",
+    `<svg height="100%" width="100%" viewBox="0 0 {{size}} {{size}}">
     <g transform="rotate(-90)" transform-origin="center center">
         {{#repeat count=segments}}
         <path class="seg-{{@index}}" stroke="var(--stroke)"
@@ -16,4 +19,5 @@
         <li class="plus context-item">+</li>
         <li class="minus context-item">-</li>
     </ul>
-</nav>
+</nav>`
+  );
