@@ -50,7 +50,6 @@ export default class ClockSidebarTab extends SidebarTab {
   getData() {
     const data: {} = super.getData();
     const clocks = Clock.getClocks();
-    console.log(data);
     const payload = {
       ...data,
       clocks: clocks.map((c, idx) =>
@@ -157,14 +156,11 @@ export default class ClockSidebarTab extends SidebarTab {
       $(el)
         .find("svg > g:not(:first-child)")
         .each((idx, el) => {
-          console.log(idx);
           $(el).click(() => {
-            console.log("clicked:", idx);
             let ticks = idx + 1;
             if (idx + 1 === Number(currentTicks)) {
               ticks = idx;
             }
-            console.log(`idx: ${idx}, ticks: ${ticks}, id: ${id}`);
             Clock.setClock(Number(id), { ticks });
           });
         });
@@ -182,12 +178,9 @@ export default class ClockSidebarTab extends SidebarTab {
         .find("button[role=edit]")
         .click((ev) => {
           const edit = this.data?.clocks[idx]?.edit ?? false;
-          console.log("click", $(clockEl).data("edit"), edit);
           if (!edit) {
-            console.log($(clockEl).find("#context-menu"));
             $(clockEl).find("aside").slideDown();
           } else {
-            console.log($(clockEl).find("#context-menu"));
             $(clockEl).find("aside").slideUp();
           }
           this.data.clocks[idx].edit = !edit;
