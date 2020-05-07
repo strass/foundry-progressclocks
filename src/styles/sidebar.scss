@@ -1,34 +1,94 @@
 // SIDEBAR:
-#sidebar {
-  // TODO: why doesn't this work? `width: Number(Sidebar.defaultOptions.width) + 30,`
+// TODO: why doesn't this work? `width: Number(Sidebar.defaultOptions.width) + 30,`
+#sidebar,
+#progressclocks-popout {
+  // height: 100%;
   width: 330px;
-  #progressclocks.tab {
-    --fill: tomato;
-    --stroke: black;
-    --background: white;
+  #progressclocks.sidebar-tab {
+    height: 100%;
+    button.circle {
+      flex: 0 0 auto;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      color: white;
+      border: 1px solid #782e22;
+      padding: 0;
+      margin: 0;
+      i {
+        transform: translateX(16%);
+      }
+    }
     flex-direction: column;
+    header {
+      flex: 0 0 auto;
+      margin-top: 12px;
+      display: flex;
+      border-bottom: 2px solid #782e22;
+      h1 {
+        border: none;
+        margin-right: auto;
+      }
+    }
     ol#clock-log {
+      flex: 1 1 auto;
+      height: -webkit-fill-available;
       list-style: none;
+      padding: 0;
+      padding-top: 6px;
+      margin: 0;
+      overflow-y: auto;
+      padding-bottom: 48px;
       li.clock {
         display: flex;
         flex-direction: column;
         header {
           display: flex;
           justify-content: space-between;
+          border-bottom: 2px solid #782e22;
           h2 {
-            flex: 1 0 auto;
+            flex: 1 1 auto;
+            border: none;
+            display: inline-flex;
           }
+          input[name="title"] {
+            background: rgba(white, 0.2);
+            font-size: 100%;
+            color: white;
+            border: none;
+            width: 100%;
+            font-family: "Signika", sans-serif;
+          }
+        }
+        aside {
+          position: absolute;
+          right: 0;
+          top: 0;
+          display: flex;
+          justify-content: flex-end;
           button {
-            flex: 0 1 auto;
-            width: min-content;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
           }
         }
-        svg {
-          margin-bottom: 16px;
-        }
-        nav#context-menu {
-          position: static;
-          margin-bottom: 24px;
+        figure {
+          position: relative;
+          margin: 0;
+          padding: 0;
+          svg {
+            margin-top: 6px;
+            margin-bottom: 16px;
+            > g {
+              transform: rotate(-90deg);
+              transform-origin: center;
+            }
+            // pointer-events: bounding-box;
+          }
         }
       }
     }

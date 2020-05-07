@@ -9,7 +9,7 @@
     "build:watch": "gulp watch",
     "clean": "gulp clean && gulp link --clean",
     "update": "npm install --save-dev gitlab:foundry-projects/foundry-pc/foundry-pc-types",
-    "regen-vendors": "npx browserify -r handlebars-helper-ternary -r @popperjs/core    > src/vendor.js"
+    "regen-vendors": "npx browserify -r handlebars-helper-ternary -r @popperjs/core  -r roughjs/bundled/rough.cjs.js:roughjs  > src/vendor.js"
   },
   "author": "",
   "license": "",
@@ -32,6 +32,7 @@
     "@popperjs/core": "^2.4.0",
     "@types/lodash": "^4.14.150",
     "handlebars-helper-ternary": "^1.0.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "roughjs": "^4.2.3"
   }
 }

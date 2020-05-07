@@ -1,10 +1,30 @@
 import { MODULE_NAME, CLOCKS_HOOKS } from "./settings";
 import Clock from "./Clock";
 import { generateClockTemplatePayload } from "./util/clocks";
+import type Rough from "roughjs";
+
+const rough = require("roughjs") as typeof Rough;
 
 export default class ClockSidebarTab extends SidebarTab {
   // TODO: edit status boolean is insufficient because I have to manage multiple edit states
   editStatus: boolean;
+  _popout: any;
+  _original: any;
+  // TODO: garbage collection for rough
+  rough: ReturnType<typeof rough.svg>[] = [];
+  data: {
+    clocks: {
+      segments: number;
+      ticks: number;
+      percent: number;
+      pathTransforms: number[][];
+      size: number;
+      id: number;
+      title: string;
+      edit: boolean;
+    }[];
+  } = { clocks: [] };
+
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       id: MODULE_NAME,
@@ -19,38 +39,112 @@ export default class ClockSidebarTab extends SidebarTab {
   constructor(options) {
     super(options);
     this.editStatus = false;
+    this.rough = [];
+
+    // Save the module into the ui obj
+    if (!ui[MODULE_NAME]) {
+      ui[MODULE_NAME] = this;
+    }
   }
 
   getData() {
-    const data = super.getData();
-    console.log(data);
-
+    const data: {} = super.getData();
     const clocks = Clock.getClocks();
-    console.log(clocks);
-    return {
+    console.log(data);
+    const payload = {
       ...data,
-      clocks: clocks.map((c) =>
+      clocks: clocks.map((c, idx) =>
         generateClockTemplatePayload({
           segments: c.segments,
           size: 300,
           ticks: c.ticks,
           id: Number(c._id),
           title: c.title,
+          edit: this.data.clocks[idx]?.edit ?? false,
         })
       ),
     };
+    this.data = payload;
+    return payload;
   }
 
-  activateListeners(html) {
+  render(force, options) {
+    return super.render(force, options);
+  }
+
+  async _renderInner(data, options) {
+    const el = await super._renderInner(data, options);
+    this._drawClocks(el);
+    return el;
+  }
+
+  _drawClocks(el: HTMLElement | JQuery<HTMLElement>) {
+    return $(el)
+      .find("svg")
+      .each((idx, el) => {
+        const roughSvg = rough.svg(el);
+        this.rough[idx] = roughSvg;
+
+        const clock = this.data.clocks[idx];
+        const degreesPerSegment = 360 / clock.segments;
+        const center = this.position.width / 2;
+        const size = this.position.width - this.position.width / 20;
+        el.append(
+          roughSvg.circle(center, center, size, {
+            seed: clock.id,
+            fill: "white",
+            fillStyle: "solid",
+          }),
+          ...Array(clock.segments)
+            .fill(undefined)
+            .map((_, idx) => {
+              return roughSvg.arc(
+                center,
+                center,
+                size,
+                size,
+                toRadians(idx * degreesPerSegment),
+                toRadians((idx + 1) * degreesPerSegment - 1),
+                true,
+                {
+                  roughness: 2,
+                  
+                  seed: clock.id,
+                  fill: clock.ticks > idx ? "tomato" : "transparent",
+                  fillStyle: "zigzag",
+                  fillWeight: 2.5,
+                  zigzagOffset: 8,
+                  hachureGap: 8,
+                }
+              );
+            })
+        );
+      });
+  }
+
+  activateListeners(html: JQuery<HTMLElement> | HTMLElement) {
+    Hooks.on(CLOCKS_HOOKS.clockSettingsUpdate, () => this.render(true, {}));
+
+    if (!Clock.userHasEditPermissions) {
+      return;
+    }
     super.activateListeners(html);
 
     const clocks = $(html).find("#clock-log").find("li.clock") as JQuery<
       HTMLLIElement
     >;
+    $(this.element)
+      .find("button[role=create]")
+      .click(() => {
+        Clock.createClock();
+      });
+    $(this.element)
+      .find("button[role=reset]")
+      .click(() => {
+        Clock.resetClocks();
+      });
     this._activeOnClickClockSegment(clocks);
     this._activateOnClickEdit(clocks);
-
-    Hooks.on(CLOCKS_HOOKS.clockSettingsUpdate, () => this.render(true));
   }
 
   /** clicking on clock segments sets the clock */
@@ -60,18 +154,19 @@ export default class ClockSidebarTab extends SidebarTab {
         "segments" | "ticks" | "id",
         string
       >;
-      Array(Number(segments))
-        .fill(undefined)
-        .forEach((_, idx) => {
-          $(el)
-            .find(`.seg-${idx}`)
-            .click(() => {
-              let ticks = idx + 1;
-              if (idx === 0 && Number(currentTicks) === 1) {
-                ticks = 0;
-              }
-              Clock.setClock(Number(id), { ticks });
-            });
+      $(el)
+        .find("svg > g:not(:first-child)")
+        .each((idx, el) => {
+          console.log(idx);
+          $(el).click(() => {
+            console.log("clicked:", idx);
+            let ticks = idx + 1;
+            if (idx + 1 === Number(currentTicks)) {
+              ticks = idx;
+            }
+            console.log(`idx: ${idx}, ticks: ${ticks}, id: ${id}`);
+            Clock.setClock(Number(id), { ticks });
+          });
         });
     });
   }
@@ -86,13 +181,36 @@ export default class ClockSidebarTab extends SidebarTab {
       $(clockEl)
         .find("button[role=edit]")
         .click((ev) => {
-          this.editStatus = !this.editStatus;
-          if (this.editStatus) {
+          const edit = this.data?.clocks[idx]?.edit ?? false;
+          console.log("click", $(clockEl).data("edit"), edit);
+          if (!edit) {
             console.log($(clockEl).find("#context-menu"));
-            $(clockEl).find("#context-menu").slideDown();
+            $(clockEl).find("aside").slideDown();
           } else {
-            $(clockEl).find("#context-menu").slideUp();
+            console.log($(clockEl).find("#context-menu"));
+            $(clockEl).find("aside").slideUp();
           }
+          this.data.clocks[idx].edit = !edit;
+          this.render(true, {});
+        });
+      ($(clockEl).find('input[name="title"]') as JQuery<HTMLInputElement>).blur(
+        (event) => {
+          Clock.setClock(Number(id), { title: event.target.value });
+        }
+      );
+      $(clockEl)
+        .find("button[role=plus]")
+        .click((ev) => {
+          Clock.setClock(Number(id), {
+            segments: Number(segments) + 1,
+          });
+        });
+      $(clockEl)
+        .find("button[role=minus]")
+        .click((ev) => {
+          Clock.setClock(Number(id), {
+            segments: Number(segments) - 1,
+          });
         });
     });
   }

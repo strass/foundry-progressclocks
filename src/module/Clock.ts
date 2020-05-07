@@ -19,7 +19,6 @@ export default class Clock extends Application {
   constructor(options: ClockOptions) {
     super({ ...options, template: clockTemplate });
     options.template = clockTemplate;
-    console.log(`Clock constructor: `, options);
     if (options.segments <= 1) {
       throw new Error("Clocks need at least 2 segments");
     }
@@ -36,7 +35,6 @@ export default class Clock extends Application {
   getId = () => this._id;
 
   static get defaultOptions() {
-    console.log(2);
     const obj = mergeObject(super.defaultOptions, {
       segments: 4,
       ticks: 0,
@@ -59,6 +57,7 @@ export default class Clock extends Application {
       ticks: 1,
       segments: 4,
       _id: new Date().valueOf(),
+      title: "New Clock",
     }
   ) => {
     const clocks = Clock.getClocks();
@@ -85,6 +84,7 @@ export default class Clock extends Application {
         ({
           ...clock,
           ...options,
+          segments: Math.max(2, options.segments || clock.segments),
         } as ClockOptions)
     );
     game.settings.set(MODULE_NAME, CLOCKS_SETTINGS_KEYS.clocks, newClocks);
@@ -116,6 +116,7 @@ export default class Clock extends Application {
         size: this.position.width,
         title: this.options.title,
         id: this._id,
+        edit: false,
       }),
     };
   }

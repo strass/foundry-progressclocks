@@ -28,12 +28,14 @@ export const generateClockTemplatePayload = ({
   size,
   ticks,
   title,
+  edit,
 }: {
   segments: number;
   size: number;
   id: number;
   ticks: number;
   title: string;
+  edit: boolean;
 }) => {
   const pathTransforms = getSegmentPaths({ segments, size });
   const data = {
@@ -44,6 +46,7 @@ export const generateClockTemplatePayload = ({
     size,
     id,
     title,
+    edit,
   };
   return data;
 };

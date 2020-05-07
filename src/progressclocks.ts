@@ -130,9 +130,8 @@ function renderClocks() {
     MODULE_NAME,
     CLOCKS_SETTINGS_KEYS.clocks
   );
-  console.log("clocks:", clocks);
+
   clocks.forEach((clock, idx) => {
-    console.log(`Clock ${idx}`);
     const c = new Clock({
       title: "New Clock",
       height: 256,

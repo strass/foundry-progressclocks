@@ -1,17 +1,32 @@
 {{log clocks}}
 <section class="sidebar-tab tab" id="progressclocks" data-tab="progressclocks">
-    <h1>Clocks</h1>
+    <header>
+        <h1>Clocks</h1>
+        <button role="create" class="circle"><i class="fas fa-plus"></i></button>
+        <button role="reset" class="circle"><i class="fas fa-trash"></i></button>
+    </header>
     <ol id="clock-log">
-        {{#each clocks}}
-        {{#with @this}}
+        {{#each clocks}} {{#with @this}}
         <li class="clock" data-id="{{ get @this id }}" data-segments="{{ get @this segments }}"
             data-ticks="{{ ticks }}">
             <header>
-                <h2>{{title}}</h2><button role="edit"><i class="fas fa-edit"></i></button>
+                {{#if (get @this edit)}}
+                <h2><input name="title" value="{{get @this title}}" /></h2>
+                {{else}}
+                <h2>{{title}}</h2>
+                {{/if}}
+                <button role="edit" class="circle"><i class="fas fa-edit"></i></button>
             </header>
-            {{> clock segments=segments  ticks=ticks  size=size  pathTransforms=pathTransforms }}
+            <figure>
+                {{#if (get @this edit)}}
+                <aside>
+                    <button role="plus" class="circle"><i class="fas fa-plus"></i></button>
+                    <button role="minus" class="circle"><i class="fas fa-minus"></i></button>
+                </aside>
+                {{/if}}
+                <svg height="{{size}}px" width="100%" viewBox="0 0 {{size}} {{size}}"></svg>
+            </figure>
         </li>
-        {{/with}}
-        {{/each}}
+        {{/with}} {{/each}}
     </ol>
 </section>
