@@ -3,7 +3,7 @@ import { registerClockPartial } from "./Handlebars/partials";
 
 export const MODULE_NAME = "progressclocks";
 export const enum CLOCKS_SETTINGS_KEYS {
-  clocks = `clocks_v4`,
+  clocks = `clocks_v1`,
   localSettings = "localsettings_v1",
 }
 export const enum CLOCKS_HOOKS {
@@ -22,13 +22,13 @@ export const registerSettings = function () {
     onChange: (newClocks: ClockOptions[]) =>
       Hooks.call(CLOCKS_HOOKS.clockSettingsUpdate),
   });
-  game.settings.register(MODULE_NAME, CLOCKS_SETTINGS_KEYS.localSettings, {
-    name: "Clocks Local Settings",
-    scope: "user",
-    config: false,
-    default: {},
-    type: Object,
-    // onChange: () => {},
-  });
-  registerClockPartial();
+  // game.settings.register(MODULE_NAME, CLOCKS_SETTINGS_KEYS.localSettings, {
+  //   name: "Clocks Local Settings",
+  //   scope: "user",
+  //   config: false,
+  //   default: {},
+  //   type: Object,
+  // });
+  Handlebars.registerHelper("ternary", require("handlebars-helper-ternary"));
+  // registerClockPartial();
 };

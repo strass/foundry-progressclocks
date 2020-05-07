@@ -1,3 +1,5 @@
+// Currently unused
+
 export const registerClockPartial = () =>
   Handlebars.registerPartial(
     "clock",
