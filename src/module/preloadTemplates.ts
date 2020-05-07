@@ -1,7 +1,11 @@
 import { MODULE_NAME } from "./settings";
 
 export const preloadTemplates = async function () {
-  const templatePaths = [`modules/${MODULE_NAME}/templates/clock.html`];
+  const templatePaths = [
+    // Huh, these prevent it from rendering?
+    // `modules/${MODULE_NAME}/templates/sidebar-tab.html`,
+    // `modules/${MODULE_NAME}/templates/sidebar-with-clocks.html`,
+  ];
 
   return loadTemplates(templatePaths);
 };
