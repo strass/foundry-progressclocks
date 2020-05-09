@@ -8,5 +8,8 @@
   "esmodules": ["progressclocks.js"],
   "styles": ["progressclocks.css"],
   "minimumCoreVersion": "0.5.5",
-  "compatibleCoreVersion": "0.5.5"
+  "compatibleCoreVersion": "0.5.5",
+  "url": "https://github.com/strass/foundry-progressclocks",
+  "manifest": "",
+  "download": "https://github.com/strass/foundry-progressclocks/releases/download/v0.1.0/progressclocks-v0.1.0.zip"
 }
