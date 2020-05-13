@@ -2,6 +2,7 @@ import { MODULE_NAME, CLOCKS_HOOKS } from "./settings";
 import Clock from "./Clock";
 import { generateClockTemplatePayload } from "./util/clocks";
 import roughjs from "roughjs/bundled/rough.esm.js";
+import type { RoughSVG } from "roughjs/bin/svg";
 
 export default class ClockSidebarTab extends SidebarTab {
   // TODO: edit status boolean is insufficient because I have to manage multiple edit states
@@ -9,7 +10,7 @@ export default class ClockSidebarTab extends SidebarTab {
   _popout: any;
   _original: any;
   // TODO: garbage collection for rough
-  rough: ReturnType<typeof roughjs.svg>[] = [];
+  rough: RoughSVG[] = [];
   data: {
     clocks: {
       segments: number;
@@ -79,7 +80,7 @@ export default class ClockSidebarTab extends SidebarTab {
     return $(el)
       .find("svg")
       .each((idx, el) => {
-        const roughSvg = roughjs.svg(el);
+        const roughSvg: RoughSVG = roughjs.svg(el);
         this.rough[idx] = roughSvg;
 
         const clock = this.data.clocks[idx];
@@ -94,26 +95,43 @@ export default class ClockSidebarTab extends SidebarTab {
           }),
           ...Array(clock.segments)
             .fill(undefined)
-            .map((_, idx) => {
-              return roughSvg.arc(
-                center,
-                center,
-                size,
-                size,
-                toRadians(idx * degreesPerSegment),
-                toRadians((idx + 1) * degreesPerSegment - 1),
-                true,
-                {
-                  roughness: 2,
-
-                  seed: clock.id,
-                  fill: clock.ticks > idx ? "tomato" : "transparent",
-                  fillStyle: "zigzag",
-                  fillWeight: 2.5,
-                  zigzagOffset: 8,
-                  hachureGap: 8,
-                }
-              );
+            .flatMap((_, idx) => {
+              return [
+                roughSvg.arc(
+                  center,
+                  center,
+                  size,
+                  size,
+                  toRadians(idx * degreesPerSegment),
+                  toRadians((idx + 1) * degreesPerSegment - 1),
+                  true,
+                  {
+                    roughness: 2,
+                    seed: clock.id,
+                    fill: clock.ticks > idx ? "tomato" : "transparent",
+                    fillStyle: "zigzag",
+                    fillWeight: 2.5,
+                    zigzagOffset: 8,
+                    hachureGap: 8,
+                  }
+                ),
+                roughSvg.arc(
+                  center,
+                  center,
+                  size,
+                  size,
+                  toRadians(idx * degreesPerSegment),
+                  toRadians((idx + 1) * degreesPerSegment - 1),
+                  true,
+                  {
+                    roughness: 0,
+                    seed: clock.id,
+                    fill: "transparent",
+                    fillStyle: "solid",
+                    stroke: "transparent",
+                  }
+                ),
+              ];
             })
         );
       });
@@ -151,12 +169,14 @@ export default class ClockSidebarTab extends SidebarTab {
         "segments" | "ticks" | "id",
         string
       >;
+      $(el).find("svg > g:odd").css("pointer-events", "none");
       $(el)
-        .find("svg > g:not(:first-child)")
+        .find("svg > g:even:not(:first-child)")
+        .css("visibility", "hidden")
         .each((idx, el) => {
           $(el).click(() => {
             let ticks = idx + 1;
-            if (idx + 1 === Number(currentTicks)) {
+            if (ticks === Number(currentTicks)) {
               ticks = idx;
             }
             Clock.setClock(Number(id), { ticks });

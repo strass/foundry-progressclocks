@@ -136,7 +136,8 @@ const tsConfig = ts.createProject("tsconfig.json", {
  * Build TypeScript
  */
 function buildTS() {
-  return gulp.src("src/**/*.ts").pipe(tsConfig()).pipe(gulp.dest("dist"));
+  return Promise.resolve();
+  // return gulp.src("src/**/*.ts").pipe(tsConfig()).pipe(gulp.dest("dist"));
 }
 
 /**
@@ -487,9 +488,9 @@ exports.link = linkUserData;
 exports.package = packageBuild;
 exports.update = updateManifest;
 exports.publish = gulp.series(
-  clean,
+  // clean,
   updateManifest,
-  execBuild,
+  // execBuild,
   packageBuild,
   execGit
 );

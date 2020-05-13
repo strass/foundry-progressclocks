@@ -1,7 +1,7 @@
-import { registerSettings, MODULE_NAME } from "./module/settings.js";
-import { preloadTemplates } from "./module/preloadTemplates.js";
+import { registerSettings, MODULE_NAME } from "./module/settings";
+import { preloadTemplates } from "./module/preloadTemplates";
 import Clock from "./module/Clock";
-import ClockSidebarTab from "./module/ClockTab.js";
+import ClockSidebarTab from "./module/ClockTab";
 const debug = false;
 Hooks.once("init", async function () {
     console.log(`${MODULE_NAME} | Initializing Progress Clocks module`);
