@@ -1,9 +1,7 @@
 import { MODULE_NAME, CLOCKS_HOOKS } from "./settings";
 import Clock from "./Clock";
 import { generateClockTemplatePayload } from "./util/clocks";
-import type Rough from "roughjs";
-
-const rough = require("roughjs") as typeof Rough;
+import roughjs from "roughjs/bundled/rough.esm.js";
 
 export default class ClockSidebarTab extends SidebarTab {
   // TODO: edit status boolean is insufficient because I have to manage multiple edit states
@@ -11,7 +9,7 @@ export default class ClockSidebarTab extends SidebarTab {
   _popout: any;
   _original: any;
   // TODO: garbage collection for rough
-  rough: ReturnType<typeof rough.svg>[] = [];
+  rough: ReturnType<typeof roughjs.svg>[] = [];
   data: {
     clocks: {
       segments: number;
@@ -81,7 +79,7 @@ export default class ClockSidebarTab extends SidebarTab {
     return $(el)
       .find("svg")
       .each((idx, el) => {
-        const roughSvg = rough.svg(el);
+        const roughSvg = roughjs.svg(el);
         this.rough[idx] = roughSvg;
 
         const clock = this.data.clocks[idx];
@@ -107,7 +105,7 @@ export default class ClockSidebarTab extends SidebarTab {
                 true,
                 {
                   roughness: 2,
-                  
+
                   seed: clock.id,
                   fill: clock.ticks > idx ? "tomato" : "transparent",
                   fillStyle: "zigzag",

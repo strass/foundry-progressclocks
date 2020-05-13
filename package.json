@@ -6,11 +6,11 @@
   "scripts": {
     "package": "gulp package",
     "build": "gulp build && gulp link",
-    "esbuild": "esbuild src/progressclocks.ts --bundle --outfile=out.js",
+    "esbuild": "esbuild src/progressclocks.ts --bundle --external:handlebars-helpers --define:global=window --outfile=dist/progressclocks.js",
     "build:watch": "gulp watch",
     "clean": "gulp clean && gulp link --clean",
     "update": "npm install --save-dev gitlab:foundry-projects/foundry-pc/foundry-pc-types",
-    "regen-vendors": "npx browserify lodash.update roughjs/bundled/rough.cjs.js:roughjs  > src/vendor.js"
+    "regen-vendors": "npx browserify -r handlebars-helpers  > src/vendor.js"
   },
   "author": "",
   "license": "",
@@ -34,6 +34,7 @@
     "@popperjs/core": "^2.4.0",
     "@types/lodash": "^4.14.150",
     "handlebars-helper-ternary": "^1.0.0",
+    "handlebars-helpers": "^0.10.0",
     "lodash": "^4.17.15",
     "lodash.update": "^4.10.2",
     "roughjs": "^4.2.3"

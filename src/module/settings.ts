@@ -1,6 +1,9 @@
-import Clock, { ClockOptions } from "./Clock";
+import { ClockOptions } from "./Clock";
+var helpers = require("handlebars-helpers")(["object"]);
+import ternary from "handlebars-helper-ternary";
 // import { registerClockPartial } from "./Handlebars/partials";
 
+console.log(helpers);
 export const MODULE_NAME = "progressclocks";
 export const enum CLOCKS_SETTINGS_KEYS {
   clocks = `clocks_v1`,
@@ -29,6 +32,7 @@ export const registerSettings = function () {
   //   default: {},
   //   type: Object,
   // });
-  // Handlebars.registerHelper("ternary", require("handlebars-helper-ternary"));
+  Handlebars.registerHelper("get", helpers.get);
+  Handlebars.registerHelper("ternary", ternary);
   // registerClockPartial();
 };
