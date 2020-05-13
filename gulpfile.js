@@ -488,9 +488,9 @@ exports.link = linkUserData;
 exports.package = packageBuild;
 exports.update = updateManifest;
 exports.publish = gulp.series(
-  // clean,
+  clean,
   updateManifest,
-  // execBuild,
+  execBuild,
   packageBuild,
   execGit
 );
