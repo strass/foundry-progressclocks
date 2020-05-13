@@ -2,7 +2,7 @@
   "name": "progressclocks",
   "title": "Progress Clocks",
   "description": "Forged in the Dark progress clocks",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "strass",
   "scripts": ["vendor.js"],
   "esmodules": ["progressclocks.js"],
@@ -11,5 +11,5 @@
   "compatibleCoreVersion": "0.5.5",
   "url": "https://github.com/strass/foundry-progressclocks",
   "manifest": "https://raw.githubusercontent.com/strass/foundry-progressclocks/master/src/module.json",
-  "download": "https://github.com/strass/foundry-progressclocks/releases/download/v0.2.0/progressclocks-v0.2.0.zip"
+  "download": "https://github.com/strass/foundry-progressclocks/releases/download/v0.2.1/progressclocks-v0.2.1.zip"
 }
