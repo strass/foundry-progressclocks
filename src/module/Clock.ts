@@ -1,9 +1,5 @@
 import { MODULE_NAME, CLOCKS_SETTINGS_KEYS } from "./settings";
-import type * as Lodash from "lodash";
-import { getSegmentPaths, generateClockTemplatePayload } from "./util/clocks";
-const _: Lodash.LoDashStatic = require("lodash");
-
-const popper = require("@popperjs/core");
+import update from "lodash.update";
 
 export type ClockOptions = ApplicationOptions & {
   segments: number;
@@ -12,6 +8,8 @@ export type ClockOptions = ApplicationOptions & {
 
 const clockTemplate = `modules/${MODULE_NAME}/templates/clock.html`;
 
+// AT THIS POINT I BELIEVE THAT ONLY THE STATIC METHODS HERE ARE BEING USED
+// TODO: CLEANUP
 export default class Clock extends Application {
   options: ClockOptions;
   _id: number;
@@ -77,7 +75,7 @@ export default class Clock extends Application {
       console.error(`No clock found with id ${id}`);
       return;
     }
-    const newClocks = _.update(
+    const newClocks = update(
       clocks,
       `[${idx}]`,
       (clock) =>
@@ -105,95 +103,65 @@ export default class Clock extends Application {
     );
   }
 
-  /** @override */
-  getData() {
-    const data = super.getData();
-    return {
-      ...data,
-      ...generateClockTemplatePayload({
-        segments: this.options.segments,
-        ticks: this.options.ticks,
-        size: this.position.width,
-        title: this.options.title,
-        id: this._id,
-        edit: false,
-      }),
-    };
-  }
+  // /** @override */
+  // getData() {
+  //   const data = super.getData();
+  //   return {
+  //     ...data,
+  //     ...generateClockTemplatePayload({
+  //       segments: this.options.segments,
+  //       ticks: this.options.ticks,
+  //       size: this.position.width,
+  //       title: this.options.title,
+  //       id: this._id,
+  //       edit: false,
+  //     }),
+  //   };
+  // }
 
-  /** @override */
-  activateListeners(html: JQuery<HTMLElement>) {
-    const nav = html[2] as HTMLElement;
-    this._contextMenu(html);
-    const hasPermissions = Clock.userHasEditPermissions;
-    if (!hasPermissions) {
-      console.warn("User lacks edit permissions for WorldSettings");
-      return;
-    }
+  // /** @override */
+  // activateListeners(html: JQuery<HTMLElement>) {
+  //   const nav = html[2] as HTMLElement;
+  //   const hasPermissions = Clock.userHasEditPermissions;
+  //   if (!hasPermissions) {
+  //     console.warn("User lacks edit permissions for WorldSettings");
+  //     return;
+  //   }
 
-    // HANDLERS
-    // plus/minus
-    $(nav)
-      .find(".plus")
-      .click(() => {
-        this._setClock({ segments: ++this.options.segments });
-      });
-    $(nav)
-      .find(".minus")
-      .click(() => {
-        this._setClock({ segments: --this.options.segments });
-      });
-    // clock segments
-    Array(this.options.segments)
-      .fill(undefined)
-      .forEach((_, idx) => {
-        (html as JQuery<HTMLElement>)
-          .find(`.seg-${idx}`)
-          .click(() => this._handleClickSegment(idx));
-      });
-  }
+  //   // HANDLERS
+  //   // plus/minus
+  //   $(nav)
+  //     .find(".plus")
+  //     .click(() => {
+  //       this._setClock({ segments: ++this.options.segments });
+  //     });
+  //   $(nav)
+  //     .find(".minus")
+  //     .click(() => {
+  //       this._setClock({ segments: --this.options.segments });
+  //     });
+  //   // clock segments
+  //   Array(this.options.segments)
+  //     .fill(undefined)
+  //     .forEach((_, idx) => {
+  //       (html as JQuery<HTMLElement>)
+  //         .find(`.seg-${idx}`)
+  //         .click(() => this._handleClickSegment(idx));
+  //     });
+  // }
 
-  _handleClickSegment = (idx: number) => {
-    if (idx === 0 && this.options.ticks === 1) {
-      this.options.ticks = 0;
-    } else {
-      this.options.ticks = idx + 1;
-    }
+  // _handleClickSegment = (idx: number) => {
+  //   if (idx === 0 && this.options.ticks === 1) {
+  //     this.options.ticks = 0;
+  //   } else {
+  //     this.options.ticks = idx + 1;
+  //   }
 
-    this._setClock({ ticks: this.options.ticks });
-  };
+  //   this._setClock({ ticks: this.options.ticks });
+  // };
 
-  /**
-   * Create a Context Menu attached to each Macro button
-   * @param html
-   * @private
-   */
-  _contextMenu(html: JQuery<HTMLElement>) {
-    const svg = html[0];
-    const nav = html[2];
-    // $(nav).css({ visibility: "hidden" });
-    const navBB = nav.getBoundingClientRect();
-
-    const virtualElement = {
-      getBoundingClientRect: () => {
-        const bb = svg.getBoundingClientRect();
-        const newObj = {
-          height: 0,
-          width: 0,
-          right: bb.right + (1 / 2) * navBB.width,
-          left: bb.right + (1 / 2) * navBB.width,
-          top: bb.top + (1 / 2) * bb.height - (1 / 2) * navBB.height,
-          bottom: bb.top + (1 / 2) * bb.height - (1 / 2) * navBB.height,
-        };
-        return newObj;
-      },
-    };
-    popper.createPopper(virtualElement, nav, {});
-  }
-
-  /** @override */
-  _updateObject(event, formData) {
-    console.debug("_updateObject in", formData);
-    // return this.object.update(formData);
-  }
+  // /** @override */
+  // _updateObject(event, formData) {
+  //   console.debug("_updateObject in", formData);
+  // }
 }
